@@ -1,0 +1,40 @@
+This Kirkwood target is intended to be used with devices based on Marvell Kirkwood 6281/2 ARM-compatible CPU (aka Feroceon/Gandalf).
+
+Those instruction tested on Marvell RD88F6281 Reference Boards but should be applyable to other devices.
+Assuming device supports NAND, root filesystem will reside on "rootfs" partition using UbiFS (last 15MB spared for possible bad sectors).
+Kernel stored as raw uImage in "uImage" partition.
+
+Currently only manual install/re-install procedures tested.
+To perform manual/initial installation you will need a TFTP server and board specific images,
+for example: "openwrt-kirkwood-rd88f6281-legacy-uImage" and "openwrt-kirkwood-rd88f6281-legacy-rootfs.ubi".
+
+Follow steps below to install firmware in to device's NAND flash.
+INvoke all of the from boot loader prompt (uBoot).
+(Remember to use apropriate network parameters)
+
+1. Prepare uBoot environment:
+	>> resetenv; reset
+	>> setenv mainlineLinux yes; save; reset
+	>> setenv ipaddr 10.5.209.85; setenv serverip 10.5.25.251
+	>> setenv loadaddr 0x2000000; setenv console 'console=ttyS0,115200 panic=10'
+	>> setenv bootargs_root 'ubi.mtd=2 root=ubi0:rootfs rootfstype=ubifs rw'
+	>> setenv rootpath '/srv/seugene/openwrt/openwrt/bin/kirkwood/'
+	>> setenv image_name openwrt-kirkwood-rd88f6281-legacy-uImage
+	>> setenv rootfs_name openwrt-kirkwood-rd88f6281-legacy-rootfs.ubi
+	>> setenv clean 'mw $(loadaddr) 0x8000000'
+	>> setenv boot_image 'tftpboot $(loadaddr) $(rootpath)$(image_name); setenv bootargs $(console) $(bootargs_root); bootm $(loadaddr)'
+	>> setenv flash_image 'run clean; tftpboot $(loadaddr) $(rootpath)$(image_name); nand erase 0x100000 0x200000; nand write.e $(loadaddr) 0x100000 $(filesize)'
+	>> setenv flash_rootfs 'run clean; tftpboot $(loadaddr)  $(rootpath)$(rootfs_name); nand erase 0x300000 0x7d00000; nand write.e $(loadaddr) 0x300000 $(filesize)'
+	>> setenv bootcmd 'run clean; setenv bootargs $(console) $(bootargs_root); nand read.e $(loadaddr) 0x100000 0x200000; bootm $(loadaddr)'
+	>> save
+
+2. Test your kernel:
+	>> run boot_image
+
+3. Install openwrt:
+	>> run flash_image; run flash_rootfs
+
+4. Boot into frash openwrt:
+	>> boot
+
+Good luck
