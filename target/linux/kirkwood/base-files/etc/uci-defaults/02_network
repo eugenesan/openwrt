@@ -43,6 +43,11 @@ case "$board" in
 "ea4500")
 	ucidef_set_interfaces_lan_wan "eth0" "eth1"
 	;;
+"rd88f6281")
+	ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" "wan eth1 eth2"
+	uci set network.lan.nat='1'
+	uci set network.wan.type='bridge'
+	;;
 *)
 	ucidef_set_interface_lan "eth0"
 	;;

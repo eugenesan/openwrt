@@ -142,6 +142,15 @@ Image/InstallKernel/Template/ICONNECT=$(call Image/InstallKernel/Template,iconne
 Image/BuildKernel/Template/POGOE02=$(call Image/BuildKernel/Template,pogo_e02)
 Image/InstallKernel/Template/POGOE02=$(call Image/InstallKernel/Template,pogo_e02)
 
+Image/BuildKernel/Template/RD88F6281-A=$(call Image/BuildKernel/Template,rd88f6281-a)
+Image/InstallKernel/Template/RD88F6281-A=$(call Image/InstallKernel/Template,rd88f6281-a)
+
+Image/BuildKernel/Template/RD88F6281=$(call Image/BuildKernel/Template,rd88f6281)
+Image/InstallKernel/Template/RD88F6281=$(call Image/InstallKernel/Template,rd88f6281)
+
+Image/BuildKernel/Template/RD88F6281-LEGACY=$(call Image/BuildKernel/Template,RD88F6281-legacy,legacy)
+Image/InstallKernel/Template/RD88F6281-LEGACY=$(call Image/InstallKernel/Template,RD88F6281-legacy,legacy)
+
 define Image/BuildKernel
 	$(call Image/BuildKernel/Template/$(PROFILE))
 endef
