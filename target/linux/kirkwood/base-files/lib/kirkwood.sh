@@ -37,6 +37,10 @@ kirkwood_board_detect() {
 		name="ea4500"
 		;;
 
+	"Marvell RD-88F6281 Reference Board")
+		name="rd88f6281"
+		;;
+
 	*)
 		name="generic"
 		;;
