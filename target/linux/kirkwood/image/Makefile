@@ -16,7 +16,9 @@ endef
 define Image/BuildKernel/Template
 
 	$(CP) $(KDIR)/zImage $(BIN_DIR)/$(IMG_PREFIX)-zImage
+ ifneq ($(2),legacy)
 	echo -ne '\x00\x00\x00\x00' >> $(BIN_DIR)/$(IMG_PREFIX)-zImage
+ endif
 	$(call Image/BuildKernel/MkuImage, \
 		none, 0x8000, 0x8000, \
 		$(BIN_DIR)/$(IMG_PREFIX)-zImage, \
@@ -25,7 +27,9 @@ define Image/BuildKernel/Template
 
  ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
 	$(CP) $(KDIR)/zImage-initramfs $(BIN_DIR)/$(IMG_PREFIX)-zImage-initramfs
+  ifneq ($(2),legacy)
 	echo -ne '\x00\x00\x00\x00' >> $(BIN_DIR)/$(IMG_PREFIX)-zImage-initramfs
+  endif
 	$(call Image/BuildKernel/MkuImage, \
 		none, 0x8000, 0x8000, \
 		$(BIN_DIR)/$(IMG_PREFIX)-zImage-initramfs, \
@@ -34,10 +38,14 @@ define Image/BuildKernel/Template
  endif
 
  ifneq ($(1),)
+  ifneq ($(2),legacy)
 	$(CP) $(DTS_DIR)/kirkwood-$(1).dtb $(BIN_DIR)/$(IMG_PREFIX)-$(1).dtb
+  endif
 
 	$(CP) $(KDIR)/zImage $(BIN_DIR)/$(IMG_PREFIX)-$(call sanitize_profile_name)-zImage
+  ifneq ($(2),legacy)
 	cat $(BIN_DIR)/$(IMG_PREFIX)-$(1).dtb >> $(BIN_DIR)/$(IMG_PREFIX)-$(call sanitize_profile_name)-zImage
+  endif
 	$(call Image/BuildKernel/MkuImage, \
 		none, 0x8000, 0x8000, \
 		$(BIN_DIR)/$(IMG_PREFIX)-$(call sanitize_profile_name)-zImage, \
@@ -46,7 +54,9 @@ define Image/BuildKernel/Template
 
   ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
 	$(CP) $(KDIR)/zImage-initramfs $(BIN_DIR)/$(IMG_PREFIX)-$(call sanitize_profile_name)-zImage-initramfs
+   ifneq ($(2),legacy)
 	cat $(BIN_DIR)/$(IMG_PREFIX)-$(1).dtb >> $(BIN_DIR)/$(IMG_PREFIX)-$(call sanitize_profile_name)-zImage-initramfs
+   endif
 	$(call Image/BuildKernel/MkuImage, \
 		none, 0x8000, 0x8000, \
 		$(BIN_DIR)/$(IMG_PREFIX)-$(call sanitize_profile_name)-zImage-initramfs, \
