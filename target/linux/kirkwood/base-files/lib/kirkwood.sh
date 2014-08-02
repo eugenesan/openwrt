@@ -10,7 +10,11 @@ kirkwood_board_detect() {
 	local machine
 	local name
 
-	machine=$(cat /proc/device-tree/model)
+	if [ -r "/proc/device-tree/model" ]; then
+		machine=`cat /proc/device-tree/model`
+	else
+		machine=`grep ^Hardware /proc/cpuinfo | sed "s/Hardware.*: \(.*\)/\1/g"`
+	fi
 
 	case "$machine" in
 	"Seagate FreeAgent Dockstar")
