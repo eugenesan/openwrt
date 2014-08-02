@@ -1,0 +1,11 @@
+--- a/arch/arm/mach-kirkwood/rd88f6281-setup.c
++++ b/arch/arm/mach-kirkwood/rd88f6281-setup.c
+@@ -34,7 +34,7 @@ static struct mtd_partition rd88f6281_na
+ 		.offset = MTDPART_OFS_NXTBLK,
+ 		.size = SZ_2M
+ 	}, {
+-		.name = "root",
++		.name = "rootfs",
+ 		.offset = MTDPART_OFS_NXTBLK,
+ 		.size = MTDPART_SIZ_FULL
+ 	},
