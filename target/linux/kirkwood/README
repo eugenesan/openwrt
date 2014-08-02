@@ -1,0 +1,39 @@
+This Kirkwood target is intended to be used with devices based on Marvell Kirkwood 6281/2 ARM-compatible CPU (aka Feroceon/Gandalf).
+
+Those instruction tested on Marvell RD88F6281 Reference Boards but should be applyable to other devices.
+We device supports NAND. Root filesystem will reside on "rootfs" partition using UBIFS (last 15MB spared for possible bad sectors).
+Kernel stored as raw uImage in "uImage" partition.
+
+Currently only manual install/re-install procedures tested.
+To perform manual/initial installation you will need a TFTP server and board specific images,
+for example: "openwrt-kirkwood-rd88f6281-legacy-uImage" and "openwrt-kirkwood-rd88f6281-legacy-rootfs.ubi".
+
+Follow steps below to install firmware in to device's NAND flash.
+INvoke all of the from boot loader prompt (uBoot).
+(Remember to use apropriate network parameters)
+
+1. Prepare uBoot environment:
+	>>resetenv; reset
+	>>setenv mainlineLinux yes; save; reset
+	>>setenv ipaddr 10.5.25.1; setenv serverip 10.5.25.251
+	>>setenv loadaddr 0x2000000; setenv console 'console=ttyS0,115200 panic=30'
+	>>setenv bootargs_root 'ubi.mtd=2 root=ubi0:rootfs rootfstype=ubifs rw'
+	>>setenv rootpath '/srv/seugene/openwrt/openwrt/bin/kirkwood/'
+	>>setenv image_name openwrt-kirkwood-rd88f6281-legacy-uImage
+	>>setenv rootfs_name openwrt-kirkwood-rd88f6281-legacy-rootfs.ubi
+	>>setenv boot_image 'tftpboot $(loadaddr) $(rootpath)$(image_name); setenv bootargs $(console) $(bootargs_root); bootm $(loadaddr)'
+	>>setenv flash_image 'tftpboot $(loadaddr) $(rootpath)$(image_name); nand erase 0x100000 0x200000; nand write.e $(loadaddr) 0x100000 0x200000'
+	>>setenv flash_rootfs 'tftpboot $(loadaddr)  $(rootpath)$(rootfs_name); nand erase 0x300000 0x7d00000; nand write.e $(loadaddr) 0x300000 0x7000000'
+	>>setenv bootcmd 'setenv bootargs $(console) $(bootargs_root); nand read.e $(loadaddr) 0x100000 0x200000; bootm $(loadaddr)'
+	>>save
+
+2. Test your kernel:
+	>>run boot_image
+
+3. Install openwrt:
+	>>run flash_image; run flash_rootfs
+
+4. Boot into frash openwrt:
+	>>boot
+
+Good luck
