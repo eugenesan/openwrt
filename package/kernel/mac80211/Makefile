@@ -28,7 +28,7 @@ PKG_DRIVERS = \
 	rt2500-usb rt61-pci rt73-usb rt2800-mmio rt2800-pci rt2800-usb rt2800-soc \
 	rtl8180 rtl8187 zd1211rw mac80211-hwsim carl9170 b43 b43legacy \
 	ath9k-common ath9k ath9k-htc ath10k ath net-libipw net-ipw2100 net-ipw2200 \
-	mwl8k mwifiex-pcie net-hermes net-hermes-pci net-hermes-plx net-hermes-pcmcia \
+	mwl8k mwifiex-pcie mwifiex-sdio mwifiex-usb net-hermes net-hermes-pci net-hermes-plx net-hermes-pcmcia \
 	iwl-legacy iwl3945 iwl4965 iwlagn wlcore wl12xx wl18xx lib80211 \
 	rtlwifi rtlwifi-pci rtlwifi-usb rtl8192c-common rtl8192ce rtl8192se \
 	rtl8192de rtl8192cu
@@ -970,7 +970,7 @@ endef
 
 define KernelPackage/mwl8k
   $(call KernelPackage/mac80211/Default)
-  TITLE:=Driver for Marvell TOPDOG 802.11 Wireless cards
+  TITLE:=Driver for Marvell TopDog/Avastar 802.11bgn Wireless cards
   URL:=http://wireless.kernel.org/en/users/Drivers/mwl8k
   DEPENDS+= @PCI_SUPPORT +kmod-mac80211 +@DRIVER_11N_SUPPORT
   FILES:=$(PKG_BUILD_DIR)/drivers/net/wireless/mwl8k.ko
@@ -978,25 +978,54 @@ define KernelPackage/mwl8k
 endef
 
 define KernelPackage/mwl8k/description
- Kernel modules for Marvell TOPDOG 802.11 Wireless cards
+ Kernel modules for Marvell TopDog/Avastar 802.11bgn Wireless cards
 endef
 
 
 define KernelPackage/mwifiex-pcie
   $(call KernelPackage/mac80211/Default)
-  TITLE:=Driver for Marvell 802.11n/802.11ac PCIe Wireless cards
+  TITLE:=Driver for Marvell 802.11bgn/ac PCIe Wireless cards
   URL:=http://wireless.kernel.org/en/users/Drivers/mwifiex
   DEPENDS+= @PCI_SUPPORT +kmod-mac80211 +@DRIVER_11N_SUPPORT
   FILES:= \
 	$(PKG_BUILD_DIR)/drivers/net/wireless/mwifiex/mwifiex.ko \
 	$(PKG_BUILD_DIR)/drivers/net/wireless/mwifiex/mwifiex_pcie.ko
-  AUTOLOAD:=$(call AutoProbe,mwifiex_pcie)
+  AUTOLOAD:=$(call AutoProbe,mwifiex-pcie)
 endef
 
 define KernelPackage/mwifiex-pcie/description
- Kernel modules for Marvell 802.11n/802.11ac PCIe Wireless cards
+ Kernel modules for Marvell 802.11bgn/ac PCIe Wireless cards
 endef
 
+define KernelPackage/mwifiex-sdio
+  $(call KernelPackage/mac80211/Default)
+  TITLE:=Driver for Marvell 802.11bgn/ac SDIO Wireless cards
+  URL:=http://wireless.kernel.org/en/users/Drivers/mwifiex
+  DEPENDS+= +kmod-mmc +kmod-mac80211 +@DRIVER_11N_SUPPORT
+  FILES:= \
+	$(PKG_BUILD_DIR)/drivers/net/wireless/mwifiex/mwifiex.ko \
+	$(PKG_BUILD_DIR)/drivers/net/wireless/mwifiex/mwifiex_sdio.ko
+  AUTOLOAD:=$(call AutoProbe,mwifiex-sdio)
+endef
+
+define KernelPackage/mwifiex-sdio/description
+ Kernel modules for Marvell 802.11bgn/ac SDIO Wireless cards
+endef
+
+define KernelPackage/mwifiex-usb
+  $(call KernelPackage/mac80211/Default)
+  TITLE:=Driver for Marvell 802.11bgn/ac USB Wireless cards
+  URL:=http://wireless.kernel.org/en/users/Drivers/mwifiex
+  DEPENDS+= @USB_SUPPORT +kmod-mac80211 +@DRIVER_11N_SUPPORT
+  FILES:= \
+	$(PKG_BUILD_DIR)/drivers/net/wireless/mwifiex/mwifiex.ko \
+	$(PKG_BUILD_DIR)/drivers/net/wireless/mwifiex/mwifiex_usb.ko
+  AUTOLOAD:=$(call AutoProbe,mwifiex-usb)
+endef
+
+define KernelPackage/mwifiex-usb/description
+ Kernel modules for Marvell 802.11bgn/ac USB Wireless cards
+endef
 
 define KernelPackage/wlcore
   $(call KernelPackage/mac80211/Default)
@@ -1609,6 +1638,8 @@ config-$(call config_package,libertas-sd) += LIBERTAS LIBERTAS_SDIO
 config-$(call config_package,libertas-usb) += LIBERTAS LIBERTAS_USB
 config-$(call config_package,mwl8k) += MWL8K
 config-$(call config_package,mwifiex-pcie) += MWIFIEX MWIFIEX_PCIE
+config-$(call config_package,mwifiex-sdio) += MWIFIEX MWIFIEX_SDIO
+config-$(call config_package,mwifiex-usb) += MWIFIEX MWIFIEX_USB
 config-$(call config_package,rtl8180) += RTL8180
 config-$(call config_package,rtl8187) += RTL8187
 config-$(call config_package,wlcore) += WLCORE WLCORE_SDIO
@@ -1839,6 +1870,7 @@ endef
 define KernelPackage/mwl8k/install
 	$(INSTALL_DIR) $(1)/lib/firmware/mwl8k
 	$(INSTALL_DATA) \
+		$(PKG_BUILD_DIR)/$(PKG_LINUX_FIRMWARE_SUBDIR)/mwl8k/fmimage_8764_ap-1.fw \
 		$(PKG_BUILD_DIR)/$(PKG_LINUX_FIRMWARE_SUBDIR)/mwl8k/fmimage_8366_ap-3.fw \
 		$(PKG_BUILD_DIR)/$(PKG_LINUX_FIRMWARE_SUBDIR)/mwl8k/fmimage_8366.fw \
 		$(PKG_BUILD_DIR)/$(PKG_LINUX_FIRMWARE_SUBDIR)/mwl8k/helper_8366.fw \
@@ -1851,6 +1883,22 @@ define KernelPackage/mwifiex-pcie/install
 	$(INSTALL_DIR) $(1)/lib/firmware/mrvl
 	$(INSTALL_DATA) \
 		$(PKG_BUILD_DIR)/$(PKG_LINUX_FIRMWARE_SUBDIR)/mrvl/pcie8897_uapsta.bin \
+		$(1)/lib/firmware/mrvl/
+endef
+
+define KernelPackage/mwifiex-sdio/install
+	$(INSTALL_DIR) $(1)/lib/firmware/mrvl
+	$(INSTALL_DATA) \
+		$(PKG_BUILD_DIR)/$(PKG_LINUX_FIRMWARE_SUBDIR)/mrvl/sd8897_uapsta.bin \
+		$(PKG_BUILD_DIR)/$(PKG_LINUX_FIRMWARE_SUBDIR)/mrvl/sd8787_uapsta.bin \
+		$(PKG_BUILD_DIR)/$(PKG_LINUX_FIRMWARE_SUBDIR)/mrvl/sd8797_uapsta.bin \
+		$(1)/lib/firmware/mrvl/
+endef
+
+define KernelPackage/mwifiex-usb/install
+	$(INSTALL_DIR) $(1)/lib/firmware/mrvl
+	$(INSTALL_DATA) \
+		$(PKG_BUILD_DIR)/$(PKG_LINUX_FIRMWARE_SUBDIR)/mrvl/usb8797_uapsta.bin \
 		$(1)/lib/firmware/mrvl/
 endef
 
@@ -2033,6 +2081,8 @@ $(eval $(call KernelPackage,iwl4965))
 $(eval $(call KernelPackage,iwl3945))
 $(eval $(call KernelPackage,mwl8k))
 $(eval $(call KernelPackage,mwifiex-pcie))
+$(eval $(call KernelPackage,mwifiex-sdio))
+$(eval $(call KernelPackage,mwifiex-usb))
 $(eval $(call KernelPackage,net-hermes))
 $(eval $(call KernelPackage,net-hermes-pci))
 $(eval $(call KernelPackage,net-hermes-plx))
