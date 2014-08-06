@@ -248,6 +248,19 @@ endef
 $(eval $(call KernelPackage,sound-soc-imx-sgtl5000))
 
 
+define KernelPackage/sound-soc-kirkwood
+  TITLE:=Marvell Kirkwood SoC sound support
+  KCONFIG:= \
+	CONFIG_SND_KIRKWOOD_SOC
+  FILES:= \
+	$(LINUX_DIR)/sound/soc/kirkwood/snd-soc-kirkwood.ko
+  AUTOLOAD:=$(call AutoLoad,65,snd-soc-kirkwood)
+  DEPENDS:=@TARGET_kirkwood +kmod-sound-soc-core
+  $(call AddDepends/sound)
+endef
+
+$(eval $(call KernelPackage,sound-soc-kirkwood))
+
 define KernelPackage/sound-soc-gw_avila
   TITLE:=Gateworks Avila SoC sound support
   KCONFIG:= \
