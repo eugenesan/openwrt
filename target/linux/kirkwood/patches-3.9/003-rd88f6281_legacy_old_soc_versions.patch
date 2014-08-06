@@ -1,0 +1,52 @@
+From bbb640ff861bcd6be9e1183bc43fdbda89978f02 Mon Sep 17 00:00:00 2001
+From: Eugene Sanivsky <seugene@marvell.com>
+Date: Mon, 4 Aug 2014 11:56:03 +0300
+Subject: [PATCH] arm: kirkwood: resuract support for Z0 SOCs
+
+---
+ arch/arm/mach-kirkwood/common.c | 8 +++-----
+ arch/arm/mach-kirkwood/mpp.c    |  2 +-
+ 2 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/mach-kirkwood/common.c b/arch/arm/mach-kirkwood/common.c
+index 49792a0..0ba710c 100644
+--- a/arch/arm/mach-kirkwood/common.c
++++ b/arch/arm/mach-kirkwood/common.c
+@@ -414,10 +417,8 @@ void __init kirkwood_sdio_init(struct mvsdio_platform_data *mvsdio_data)
+ 	u32 dev, rev;
+ 
+ 	kirkwood_pcie_id(&dev, &rev);
+-	if (rev == 0 && dev != MV88F6282_DEV_ID) /* catch all Kirkwood Z0's */
+-		mvsdio_data->clock = 100000000;
+-	else
+-		mvsdio_data->clock = 200000000;
++
++	mvsdio_data->clock = ((dev == MV88F6281_DEV_ID) && (rev < MV88F6281_REV_A0)) ? 100000000 : 200000000;
+ 	kirkwood_sdio.dev.platform_data = mvsdio_data;
+ 	platform_device_register(&kirkwood_sdio);
+ }
+@@ -545,7 +546,7 @@ static int __init kirkwood_find_tclk(void)
+ 
+ 	kirkwood_pcie_id(&dev, &rev);
+ 
+-	if (dev == MV88F6281_DEV_ID || dev == MV88F6282_DEV_ID)
++	if (((dev == MV88F6281_DEV_ID) && (rev > 0)) || dev == MV88F6282_DEV_ID)
+ 		if (((readl(SAMPLE_AT_RESET) >> 21) & 1) == 0)
+ 			return 200000000;
+ 
+diff --git a/arch/arm/mach-kirkwood/mpp.c b/arch/arm/mach-kirkwood/mpp.c
+index e96fd71..dfb470c 100644
+--- a/arch/arm/mach-kirkwood/mpp.c
++++ b/arch/arm/mach-kirkwood/mpp.c
+@@ -22,7 +22,7 @@ static unsigned int __init kirkwood_variant(void)
+ 
+ 	kirkwood_pcie_id(&dev, &rev);
+ 
+-	if (dev == MV88F6281_DEV_ID && rev >= MV88F6281_REV_A0)
++	if (dev == MV88F6281_DEV_ID && rev >= MV88F6281_REV_Z0)
+ 		return MPP_F6281_MASK;
+ 	if (dev == MV88F6282_DEV_ID)
+ 		return MPP_F6282_MASK;
+-- 
+2.0.4
+
