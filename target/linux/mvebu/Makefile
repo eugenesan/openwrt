@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 ARCH:=arm
 BOARD:=mvebu
 BOARDNAME:=Marvell Armada XP/370
-FEATURES:=targz usb pci pcie gpio nand squashfs
+FEATURES:=targz usb pci pcie gpio jffs2_nand nand ubifs squashfs
 CPU_TYPE:=cortex-a9
 CPU_SUBTYPE:=vfpv3
 MAINTAINER:=Luka Perkov <luka@openwrt.org>
