@@ -34,6 +34,9 @@ endef
 define Package/ca-certificates/install
 	$(INSTALL_DIR) $(1)/etc/ssl/certs
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/share/ca-certificates/*/*.crt $(1)/etc/ssl/certs/
+# $ c_rehash .
+# $ cd cacerts; tar -cJf hashes.tar.xz *
+	$(TAR) -C $(1)/etc/ssl/certs/ -xavf hashes.tar.xz
 endef
 
 $(eval $(call BuildPackage,ca-certificates))
