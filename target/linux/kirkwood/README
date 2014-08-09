@@ -1,7 +1,7 @@
 This Kirkwood target is intended to be used with devices based on Marvell Kirkwood 6281/2 ARM-compatible CPU (aka Feroceon/Gandalf).
 
 Those instruction tested on Marvell RD88F6281 Reference Boards but should be applyable to other devices.
-We device supports NAND. Root filesystem will reside on "rootfs" partition using UBIFS (last 15MB spared for possible bad sectors).
+Assuming device supports NAND, root filesystem will reside on "rootfs" partition using UbiFS (last 15MB spared for possible bad sectors).
 Kernel stored as raw uImage in "uImage" partition.
 
 Currently only manual install/re-install procedures tested.
