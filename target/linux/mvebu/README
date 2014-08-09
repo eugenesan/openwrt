@@ -1,0 +1,40 @@
+This MvEBU target is intended to be used with devices based on Marvell Armada 370/XP ARM-compatible CPU (aka Ferocean PJ4B).
+
+Those instruction were tested on Globalscape Mirabox Board but should be applyable to other devices.
+Assuming device supports NAND, root filesystem will reside on "rootfs" partition using UbiFS (last 15MB spared for possible bad sectors).
+Kernel stored as raw uImage in "uImage" partition.
+
+Currently only manual install/re-install procedures tested.
+To perform manual/initial installation you will need a TFTP server and board specific images,
+for example: "openwrt-mvebu-generic-uImage" and "openwrt-mvebu-generic-rootfs.ubi".
+
+Follow steps below to install firmware in to device's NAND flash.
+INvoke all of the from boot loader prompt (uBoot).
+(Remember to use apropriate network parameters)
+
+1. Prepare uBoot environment:
+	>> resetenv; reset
+	>> setenv mainlineLinux yes; save; reset
+	>> setenv ipaddr 10.5.209.83; setenv serverip 10.5.25.251; setenv gatewayip 10.5.209.254
+	>> setenv loadaddr 0x2000000; setenv console 'console=ttyS0,115200 panic=10'
+	>> setenv bootargs_root 'ubi.mtd=2 root=ubi0:rootfs rootfstype=ubifs rw'
+	>> setenv rootpath '/srv/seugene/openwrt/openwrt/bin/mvebu/'
+	>> setenv image_name openwrt-mvebu-uImage-armada-370-mirabox
+	>> setenv rootfs_name openwrt-mvebu-root.ubi
+	>> setenv clean 'mw ${loadaddr} 0x8000000'
+	>> setenv boot_image 'tftpboot ${loadaddr} ${rootpath}${image_name}; setenv bootargs ${console} ${bootargs_root}; bootm ${loadaddr}'
+	>> setenv flash_image 'run clean; tftpboot ${loadaddr} ${rootpath}${image_name}; nand erase 0x400000 0x400000; nand write.e ${loadaddr} 0x400000 0x400000'
+	>> setenv flash_rootfs 'run clean; tftpboot ${loadaddr}  ${rootpath}${rootfs_name}; nand erase 0x800000 0x3f800000; nand write.e ${loadaddr} 0x800000 ${filesize}'
+	>> setenv bootcmd 'run clean; setenv bootargs ${console} ${bootargs_root}; nand read.e ${loadaddr} 0x400000 0x400000; bootm ${loadaddr}'
+	>> save
+
+2. Test your kernel:
+	>> run boot_image
+
+3. Install openwrt:
+	>> run flash_image; run flash_rootfs
+
+4. Boot into frash openwrt:
+	>> boot
+
+Good luck
