@@ -16,13 +16,17 @@ INvoke all of the from boot loader prompt (uBoot).
 	>> resetenv; reset
 	>> setenv mainlineLinux yes; save; reset
 	>> setenv ipaddr 10.5.209.83; setenv serverip 10.5.25.251; setenv gatewayip 10.5.209.254
-	>> setenv loadaddr 0x2000000; setenv console 'console=ttyS0,115200 panic=10'
+	>> setenv loadaddr 0x2000000; setenv fdtaddr 0x1000000; setenv console 'console=ttyS0,115200 panic=10'
 	>> setenv bootargs_root 'ubi.mtd=2 root=ubi0:rootfs rootfstype=ubifs rw'
 	>> setenv rootpath '/srv/seugene/openwrt/openwrt/bin/mvebu/'
+	>> setenv linuxpath '/srv/seugene/linux/arch/arm/boot/'
 	>> setenv image_name openwrt-mvebu-uImage-armada-370-mirabox
+	>> setenv dtb_name armada-370-db.dtb
 	>> setenv rootfs_name openwrt-mvebu-root.ubi
 	>> setenv clean 'mw ${loadaddr} 0x8000000'
 	>> setenv boot_image 'tftpboot ${loadaddr} ${rootpath}${image_name}; setenv bootargs ${console} ${bootargs_root}; bootm ${loadaddr}'
+	>> setenv test_linux 'tftpboot ${loadaddr} ${linuxpath}uImage; setenv bootargs ${console} ${bootargs_root}; bootm ${loadaddr}'
+	>> setenv test_dtb 'tftpboot ${loadaddr} ${linuxpath}zImage; tftpboot ${fdtaddr} ${linuxpath}dts/${dtb_name}; setenv bootargs ${console} ${bootargs_root}; bootz ${loadaddr} - ${fdtaddr}'
 	>> setenv flash_image 'run clean; tftpboot ${loadaddr} ${rootpath}${image_name}; nand erase 0x400000 0x400000; nand write.e ${loadaddr} 0x400000 0x400000'
 	>> setenv flash_rootfs 'run clean; tftpboot ${loadaddr}  ${rootpath}${rootfs_name}; nand erase 0x800000 0x3f800000; nand write.e ${loadaddr} 0x800000 ${filesize}'
 	>> setenv bootcmd 'run clean; setenv bootargs ${console} ${bootargs_root}; nand read.e ${loadaddr} 0x400000 0x400000; bootm ${loadaddr}'
