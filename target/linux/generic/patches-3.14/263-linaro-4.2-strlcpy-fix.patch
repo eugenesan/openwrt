@@ -1,0 +1,76 @@
+From a3bfceb299d602e3ac7a651b21964f7f1b604905 Mon Sep 17 00:00:00 2001
+From: Eugene Sanivsky <seugene@marvell.com>
+Date: Mon, 18 Aug 2014 17:52:40 +0300
+Subject: [PATCH] Partially revert "tools/perf: Turn strlcpy() into a __weak
+ function"
+
+This partially reverts commit fb1c9185e36cf9c616ac15f54e54a01f052672bd.
+---
+ tools/perf/config/Makefile |  4 ++++
+ tools/perf/util/cache.h    |  3 ++-
+ tools/perf/util/path.c     | 10 +++-------
+ 3 files changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/tools/perf/config/Makefile b/tools/perf/config/Makefile
+index 0331ea2..49b17e3 100644
+--- a/tools/perf/config/Makefile
++++ b/tools/perf/config/Makefile
+@@ -477,6 +477,10 @@ else
+   endif
+ endif
+ 
++ifdef NO_STRLCPY
++  CFLAGS += -DHAVE_STRLCPY_SUPPORT
++endif
++
+ ifeq ($(feature-libbfd), 1)
+   EXTLIBS += -lbfd -lz -liberty
+ endif
+diff --git a/tools/perf/util/cache.h b/tools/perf/util/cache.h
+index 7b176dd..442953c 100644
+--- a/tools/perf/util/cache.h
++++ b/tools/perf/util/cache.h
+@@ -70,7 +70,8 @@ extern char *perf_path(const char *fmt, ...) __attribute__((format (printf, 1, 2
+ extern char *perf_pathdup(const char *fmt, ...)
+ 	__attribute__((format (printf, 1, 2)));
+ 
+-/* Matches the libc/libbsd function attribute so we declare this unconditionally: */
++#ifndef HAVE_STRLCPY_SUPPORT
+ extern size_t strlcpy(char *dest, const char *src, size_t size);
++#endif
+ 
+ #endif /* __PERF_CACHE_H */
+diff --git a/tools/perf/util/path.c b/tools/perf/util/path.c
+index 5d13cb4..f395874 100644
+--- a/tools/perf/util/path.c
++++ b/tools/perf/util/path.c
+@@ -22,23 +22,19 @@ static const char *get_perf_dir(void)
+ 	return ".";
+ }
+ 
+-/*
+- * If libc has strlcpy() then that version will override this
+- * implementation:
+- */
+-size_t __weak strlcpy(char *dest, const char *src, size_t size)
++#ifndef HAVE_STRLCPY_SUPPORT
++size_t strlcpy(char *dest, const char *src, size_t size)
+ {
+ 	size_t ret = strlen(src);
+ 
+ 	if (size) {
+ 		size_t len = (ret >= size) ? size - 1 : ret;
+-
+ 		memcpy(dest, src, len);
+ 		dest[len] = '\0';
+ 	}
+-
+ 	return ret;
+ }
++#endif
+ 
+ static char *get_pathname(void)
+ {
+-- 
+2.0.4
+
