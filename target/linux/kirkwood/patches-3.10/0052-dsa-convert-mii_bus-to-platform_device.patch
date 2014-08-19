@@ -1,0 +1,92 @@
+From b79e6f8690a1e1b5d393e26b695778f6aba104f6 Mon Sep 17 00:00:00 2001
+From: Eugene Sanivsky <seugene@marvell.com>
+Date: Tue, 19 Aug 2014 15:19:10 +0300
+Subject: [PATCH] dsa: convert mii_bus to platform_device
+
+Since plat-orion swithed to mdio as platform_device, we adapt dsa accordingly
+---
+ arch/arm/plat-orion/common.c            |  2 +-
+ arch/blackfin/mach-bf518/boards/ezbrd.c |  2 +-
+ include/net/dsa.h                       |  2 +-
+ net/dsa/dsa.c                           | 19 +------------------
+ 4 files changed, 4 insertions(+), 21 deletions(-)
+
+diff --git a/arch/arm/plat-orion/common.c b/arch/arm/plat-orion/common.c
+index c019b7a..2aa48cc 100644
+--- a/arch/arm/plat-orion/common.c
++++ b/arch/arm/plat-orion/common.c
+@@ -498,7 +498,7 @@ void __init orion_ge00_switch_init(struct dsa_platform_data *d, int irq)
+ 
+ 	d->netdev = &orion_ge00.dev;
+ 	for (i = 0; i < d->nr_chips; i++)
+-		d->chip[i].mii_bus = &orion_ge00_shared.dev;
++		d->chip[i].mii_bus = &orion_ge_mvmdio;
+ 	orion_switch_device.dev.platform_data = d;
+ 
+ 	platform_device_register(&orion_switch_device);
+diff --git a/arch/blackfin/mach-bf518/boards/ezbrd.c b/arch/blackfin/mach-bf518/boards/ezbrd.c
+index f8047ca..3a8fffa 100644
+--- a/arch/blackfin/mach-bf518/boards/ezbrd.c
++++ b/arch/blackfin/mach-bf518/boards/ezbrd.c
+@@ -142,7 +142,7 @@ static struct platform_device bfin_mac_device = {
+ 
+ #if defined(CONFIG_NET_DSA_KSZ8893M) || defined(CONFIG_NET_DSA_KSZ8893M_MODULE)
+ static struct dsa_chip_data ksz8893m_switch_chip_data = {
+-	.mii_bus = &bfin_mii_bus.dev,
++	.mii_bus = &bfin_mii_bus,
+ 	.port_names = {
+ 		NULL,
+ 		"eth%d",
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 7828ebf..b8bb3e1 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -23,7 +23,7 @@ struct dsa_chip_data {
+ 	/*
+ 	 * How to access the switch configuration registers.
+ 	 */
+-	struct device	*mii_bus;
++	struct platform_device	*mii_bus;
+ 	int		sw_addr;
+ 
+ 	/*
+diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
+index 0eb5d5e..fced39e 100644
+--- a/net/dsa/dsa.c
++++ b/net/dsa/dsa.c
+@@ -256,23 +256,6 @@ static struct device *dev_find_class(struct device *parent, char *class)
+ 	return device_find_child(parent, class, dev_is_class);
+ }
+ 
+-static struct mii_bus *dev_to_mii_bus(struct device *dev)
+-{
+-	struct device *d;
+-
+-	d = dev_find_class(dev, "mdio_bus");
+-	if (d != NULL) {
+-		struct mii_bus *bus;
+-
+-		bus = to_mii_bus(d);
+-		put_device(d);
+-
+-		return bus;
+-	}
+-
+-	return NULL;
+-}
+-
+ static struct net_device *dev_to_net_device(struct device *dev)
+ {
+ 	struct device *d;
+@@ -537,7 +520,7 @@ static int dsa_probe(struct platform_device *pdev)
+ 		struct mii_bus *bus;
+ 		struct dsa_switch *ds;
+ 
+-		bus = dev_to_mii_bus(pd->chip[i].mii_bus);
++		bus = platform_get_drvdata(pd->chip[i].mii_bus);
+ 		if (bus == NULL) {
+ 			printk(KERN_ERR "%s[%d]: no mii bus found for "
+ 				"dsa switch\n", dev->name, i);
+-- 
+2.1.0
+
