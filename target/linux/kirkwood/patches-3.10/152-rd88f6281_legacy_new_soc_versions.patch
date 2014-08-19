@@ -1,0 +1,25 @@
+From 02606a008b2611bf3dda4c5e2813161b4dc0745d Mon Sep 17 00:00:00 2001
+From: Eugene Sanivsky <seugene@marvell.com>
+Date: Fri, 1 Aug 2014 09:33:47 +0300
+Subject: [PATCH] arm: kirkwood: support A1+ SOC versions
+
+---
+ arch/arm/mach-kirkwood/rd88f6281-setup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-kirkwood/rd88f6281-setup.c b/arch/arm/mach-kirkwood/rd88f6281-setup.c
+index c7d93b4..4738428 100644
+--- a/arch/arm/mach-kirkwood/rd88f6281-setup.c
++++ b/arch/arm/mach-kirkwood/rd88f6281-setup.c
+@@ -91,7 +91,7 @@ static void __init rd88f6281_init(void)
+ 
+ 	kirkwood_ge00_init(&rd88f6281_ge00_data);
+ 	kirkwood_pcie_id(&dev, &rev);
+-	if (rev == MV88F6281_REV_A0) {
++	if (rev >= MV88F6281_REV_A0) {
+ 		rd88f6281_switch_chip_data.sw_addr = 10;
+ 		kirkwood_ge01_init(&rd88f6281_ge01_data);
+ 	} else {
+-- 
+2.0.4
+
