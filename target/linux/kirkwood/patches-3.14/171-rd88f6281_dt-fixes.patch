@@ -1,7 +1,7 @@
 From 9a5b2aa46d5e692f7d3610472a19b8c4f26e0579 Mon Sep 17 00:00:00 2001
 From: Eugene Sanivsky <seugene@marvell.com>
 Date: Tue, 19 Aug 2014 18:52:53 +0300
-Subject: [PATCH 2/3] ARM: Kirkwood: Fix convertion of rd88f6281-setup.c to DT
+Subject: [PATCH] ARM: Kirkwood: Fix convertion of rd88f6281-setup.c to DT
 
 ---
  arch/arm/boot/dts/Makefile                  |  4 +--
@@ -20,17 +20,17 @@ diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
 index 3dd2aae..41f850b 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
-@@ -91,8 +91,8 @@
- 	kirkwood-ts219-6281.dtb \
- 	kirkwood-ts219-6282.dtb \
+@@ -113,8 +113,8 @@
+ 	kirkwood-nsa310a.dtb \
  	kirkwood-openblocks_a6.dtb \
+ 	kirkwood-openblocks_a7.dtb \
 -	kirkwood-rd88f6281-a0.dtb \
--	kirkwood-rd88f6281-a1.dtb
+-	kirkwood-rd88f6281-a1.dtb \
 +	kirkwood-rd88f6281.dtb \
-+	kirkwood-rd88f6281-a.dtb
- dtb-$(CONFIG_ARCH_MARCO) += marco-evb.dtb
- dtb-$(CONFIG_ARCH_MSM) += msm8660-surf.dtb \
- 	msm8960-cdp.dtb
++	kirkwood-rd88f6281-a.dtb \
+ 	kirkwood-pogo_e02.dtb \
+ 	kirkwood-sheevaplug.dtb \
+ 	kirkwood-sheevaplug-esata.dtb \
 diff --git a/arch/arm/boot/dts/kirkwood-rd88f6281-a.dts b/arch/arm/boot/dts/kirkwood-rd88f6281-a.dts
 new file mode 100644
 index 0000000..c62242e
