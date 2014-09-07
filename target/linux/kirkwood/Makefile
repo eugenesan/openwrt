@@ -13,7 +13,7 @@ FEATURES:=targz usb pci pcie gpio jffs2_nand nand ubifs
 CPU_TYPE:=xscale
 MAINTAINER:=Imre Kaloz <kaloz@openwrt.org>
 
-LINUX_VERSION:=3.10.53
+LINUX_VERSION:=3.10.55
 
 include $(INCLUDE_DIR)/target.mk
 
