@@ -223,6 +223,20 @@ define Image/Build/Profile/385-DB-AP/squashfs
 	) > $(BIN_DIR)/$(IMG_PREFIX)-armada-385-db-ap-squashfs-factory.img
 endef
 
+###
+### Globalscape
+###
+
+# Globalscape Mirabox
+define Image/Build/Profile/Mirabox/squashfs
+	$(call Image/Build/UbinizeImage,armada-370-mirabox,,squashfs, -p 512KiB -m 4096)
+	( \
+		dd if=$(KDIR)/uImage-armada-370-mirabox bs=4M conv=sync; \
+		dd if=$(KDIR)/$(IMG_PREFIX)-armada-370-mirabox-squashfs-ubinized.bin \
+		bs=4096 conv=sync; \
+	) > $(BIN_DIR)/$(IMG_PREFIX)-armada-370-mirabox-squashfs-factory.img
+endef
+
 
 # The Default profile should build everything
 $(eval $(call MultiProfile,Default,$(PROFILES_LIST)))

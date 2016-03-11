@@ -11,7 +11,8 @@ define Profile/Mirabox
 	kmod-usb3 kmod-usb-storage \
 	kmod-i2c-core kmod-i2c-mv64xxx \
 	kmod-rtc-marvell kmod-thermal-armada \
-	kmod-gpio-button-hotplug kmod-mmc kmod-mvsdio
+	kmod-gpio-button-hotplug kmod-mmc kmod-mvsdio \
+	kmod-ledtrig-usbdev mwifiex-sdio wpad-mini
 endef
 
 define Profile/Mirabox/Description

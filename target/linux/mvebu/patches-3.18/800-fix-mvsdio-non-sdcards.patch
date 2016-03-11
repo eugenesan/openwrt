@@ -1,0 +1,12 @@
+--- a/drivers/bus/mvebu-mbus.c
++++ b/drivers/bus/mvebu-mbus.c
+@@ -729,6 +729,9 @@
+ 		return -ENOMEM;
+ 	}
+ 
++	if (of_find_compatible_node(NULL, NULL, "marvell,coherency-fabric"))
++		mbus->hw_io_coherency = 1;
++
+ 	for (win = 0; win < mbus->soc->num_wins; win++)
+ 		mvebu_mbus_disable_window(mbus, win);
+ 
