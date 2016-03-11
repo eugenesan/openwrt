@@ -1,0 +1,34 @@
+This MVEBU target is intended to be used on devices based on Marvell ArmadaXP/Armada37x/Armada38x ARM-compatible CPUs (aka PJ4x/PJ5x).
+
+Following instruction were tested on Globalscape Mirabox v1.0 but should be applyable to other devices with minor modifications.
+Device assumed to supports NAND.
+Kernel resides in second partition (4MB) using uImage format.
+Root filesystem resides third partition (1016MB) using UBIFS.
+
+Currently only manual install/re-install procedure tested.
+We use combined "factory" (kernel+rootfs) image called openwrt-15.05-mvebu-armada-370-mirabox-squashfs-firmware.bin we assue it's size to be 16MB at the most.
+
+The following commands should be invoked from boot loader (uBoot) prompt.
+(Remember to use apropriate network parameters)
+
+1. Setup tftpserver with root at /home/tmp
+2. Copy factory image to tftp server root
+3. Prepare uBoot environment (modify network paramters if needed):
+	>> resetenv; reset
+	>> mainlineLinux yes; save; reset
+	>> ipaddr 192.168.1.100; setenv serverip 192.168.1.4
+	>> setenv loadaddr 0x2000000; setenv console 'console=ttyS0,115200 panic=10'
+	>> setenv bootargs_root 'ubi.mtd=2'
+	>> setenv rootpath '/home/tmp/'
+	>> setenv image_name openwrt-15.05-mvebu-armada-370-mirabox-squashfs-firmware.bin
+	>> setenv rootfs_name root
+	>> setenv clean_mem 'mw ${loadaddr} 0x1000000'
+	>> setenv flash_image 'run clean_mem; tftpboot ${loadaddr} ${rootpath}${image_name}; nand erase 0x400000 0x3fc00000; nand write.e ${loadaddr} 0x400000 0x1000000'
+	>> setenv bootcmd 'run clean_mem; setenv bootargs ${console} ${bootargs_root}; nand read.e ${loadaddr} 0x400000 0x400000; bootm ${loadaddr}'
+	>> save
+3. Install openwrt:
+	>> run flash_image
+4. Boot into openwrt:
+	>> boot
+
+Good luck
